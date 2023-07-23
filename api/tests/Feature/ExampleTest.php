@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\UserWeather;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,5 +28,8 @@ class ExampleTest extends TestCase
         User::factory(20)->create();
 
         $this->assertEquals(20, User::all()->count());
+
+        // we don't really want to seed that table right now
+        $this->assertEquals(0, UserWeather::all()->count());
     }
 }
