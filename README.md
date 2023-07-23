@@ -37,9 +37,25 @@ Using Laravel and VueJS, create an application which shows the weather for a set
   - Setup app key: `php artisan key:generate`
   - Migrate database: `php artisan migrate` 
   - Seed database: `php artisan db:seed`
-  - Add an `OPEN_WEATHER_KEY` API key to `.env` (see the links above) 
+  - Add an `OPEN_WEATHER_KEY` API key to `.env` (see the links above)
   - Run tests: `php artisan test`
   - Visit api: `http://localhost`
+
+#### Getting the weather for our users
+
+##### Via CLI command
+- Run the CLI command `php artisan fetch-weather`
+
+##### Via Queued Job
+- Run the queue listener `php artisan queue:listen`
+- Dispatch the job onto the queue manually
+  - Open a Tinker session `php artisan tinker`
+  - Dispatch the job `FetchUserWeather::dispatch()`
+
+##### Via CRON job
+The `App\Console\Kernel` is set to dispatch the `FetchUserWeather` job onto the queue every 10 minutes, you can run it by:
+- Option A: Manually run the `php artisan schedule:run` command and hope to trigger it (not impossible)
+- Option B: set up a cronjob in the container to run it for you. See: https://www.baeldung.com/ops/docker-cron-job
 
 ### Frontend
 - Navigate to `/frontend` folder

@@ -9,7 +9,11 @@ RUN apt-get install -y \
 RUN docker-php-ext-install \
     mysqli \
     pdo_mysql \
-    zip
+    zip \
+    pcntl \
+    posix
+
+RUN pecl install -o -f redis && docker-php-ext-enable redis
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
