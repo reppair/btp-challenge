@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(FetchUserWeather::class)->everyMinute();
+        $schedule->job(FetchUserWeather::class)->everyTenMinutes();
     }
 
     /**
