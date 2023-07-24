@@ -3,31 +3,55 @@
 import WeatherDetailsModal from "@/components/WeatherDetailsModal.vue"
 
 export default {
-  components: {WeatherDetailsModal},
+    components: {WeatherDetailsModal},
 
-  data: () => ({
-    apiResponse: null,
-    user: null,
-  }),
+    data: () => ({
+        apiResponse: null,
+        user: null,
+    }),
 
-  created() {
-    this.fetchData()
-  },
+    created() {
+        this.fetchData()
 
-  methods: {
-    async fetchData() {
-      const url = 'http://localhost/'
-      this.apiResponse = await (await fetch(url)).json()
+        if (typeof Echo !== 'undefined') {
+            this.subscribeToWeatherUpdateChannel()
+        }
     },
 
-    showWeatherDetails(user) {
-      if (! user.weather) {
-        return
-      }
+    methods: {
+        async fetchData(userIds = null) {
+            let url = 'http://localhost/'
 
-      this.user = user;
-    }
-  }
+            if (userIds) {
+                let query = Object.values(userIds)
+                    .map(id => `ids[]=${id}`)
+                    .join('&');
+
+                url = url + '?' + query
+            }
+
+          this.apiResponse = await (await fetch(url)).json()
+        },
+
+        showWeatherDetails(user) {
+            if (!user.weather) {
+                return
+            }
+
+            this.user = user;
+        },
+
+        subscribeToWeatherUpdateChannel() {
+            Echo.channel('weather')
+                .listen('WeatherUpdated', e => {
+                    this.fetchData(e.userIds)
+
+                    if (this.user) {
+                        this.user = this.apiResponse.users.find(u => u.id = this.user.id)
+                    }
+                });
+        }
+    },
 }
 </script>
 

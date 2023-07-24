@@ -14,8 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return response()->json([
-        'users' => \App\Models\User::with('weather')->get(),
+Route::get('/', function (Request $request) {
+    $query = \App\Models\User::with('weather');
+
+    if ($request->missing('ids')) {
+        return response()->json(['users' => $query->get()]);
+    }
+
+    $validated = $request->validate([
+        'ids' => 'nullable|array',
+        'ids.*' => 'int',
     ]);
+
+    $query->whereIn('id', $validated['ids']);
+
+    return response()->json(['users' => $query->get()]);
 });

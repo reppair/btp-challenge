@@ -57,6 +57,17 @@ The `App\Console\Kernel` is set to dispatch the `FetchUserWeather` job onto the 
 - Option A: Manually run the `php artisan schedule:run` command and hope to trigger it (not impossible)
 - Option B: set up a cronjob in the container to run it for you. See: https://www.baeldung.com/ops/docker-cron-job
 
+### Updating the Front-End in Real-Time via websocets (using Pusher)
+See the Laravel documentation for setup details - https://laravel.com/docs/10.x/broadcasting#configuration.
+
+#### At the server-side (api folder)
+- Set the `BROADCAST_DRIVER` .env variable to `pusher` driver
+- Register new Pusher app and set the `PUSHER_*` .env variables - key, secret, etc.
+
+#### At the client-side (frontend folder)
+- Copy the `.env.example` file to `.env`
+- Set the Pusher credentials in `.env` so the build can access these and subscribe to the Pusher weather channel for receiving updates 
+
 ### Frontend
 - Navigate to `/frontend` folder
 - Ensure nodejs v18 is active on host

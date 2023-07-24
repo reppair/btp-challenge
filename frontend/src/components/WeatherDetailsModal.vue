@@ -15,7 +15,7 @@
                         <div class="mt-3 sm:mt-5">
                             <h3 class="text-base text-center font-semibold leading-6 text-gray-900" id="modal-title">Weather Details</h3>
 
-                            <h4 class="mt-6 text-sm font-semibold leading-6 text-gray-900" id="modal-title">Summary</h4>
+                            <h4 class="mt-6 text-sm font-semibold leading-6 text-gray-900" id="modal-title">Summary (last updated at: {{ weather.updated_at }})</h4>
 
                             <dl class="mt-2 text-sm text-gray-600 inline-block mx-auto">
                                 <div class="flex space-x-2" v-for="(value, key) in weather.data">
