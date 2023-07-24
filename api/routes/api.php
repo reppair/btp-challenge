@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return response()->json([
-        'message' => 'all systems are a go',
-        'users' => \App\Models\User::all(),
+        'users' => \App\Models\User::with('weather')->get(),
     ]);
 });
