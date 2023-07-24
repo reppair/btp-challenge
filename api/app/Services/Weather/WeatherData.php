@@ -14,6 +14,7 @@ class WeatherData
         public readonly string $timezone,
         public readonly float $currentTemp,
         public readonly string $currentWeatherDesc,
+        public readonly array $daily, // should really be a dedicated object in our domain (external services should not dictate our own data structures)
     ) {
         // todo: self check if the passed data is valid here...
     }

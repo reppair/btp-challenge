@@ -1,7 +1,13 @@
 <script>
+
+import WeatherDetailsModal from "@/components/WeatherDetailsModal.vue"
+
 export default {
+  components: {WeatherDetailsModal},
+
   data: () => ({
-    apiResponse: null
+    apiResponse: null,
+    user: null,
   }),
 
   created() {
@@ -12,6 +18,14 @@ export default {
     async fetchData() {
       const url = 'http://localhost/'
       this.apiResponse = await (await fetch(url)).json()
+    },
+
+    showWeatherDetails(user) {
+      if (! user.weather) {
+        return
+      }
+
+      this.user = user;
     }
   }
 }
@@ -24,7 +38,10 @@ export default {
 
     <div v-if="apiResponse">
         <ul role="list" class="divide-y divide-gray-100">
-            <li class="relative py-5 hover:bg-gray-50 group" v-for="user in apiResponse.users">
+            <li class="relative py-5 hover:bg-gray-50 group"
+                v-for="user in apiResponse.users"
+                @click="showWeatherDetails(user)"
+            >
                 <div class="px-4 sm:px-6 lg:px-8">
                     <div class="mx-auto flex max-w-4xl justify-between gap-x-6">
                         <div class="flex gap-x-4">
@@ -50,7 +67,11 @@ export default {
 
                         <div class="flex items-center gap-x-4" v-if="user.weather">
                             <div class="hidden sm:flex sm:flex-col sm:items-end">
-                                <p class="text-sm leading-6 text-gray-900" v-text="user.weather.data.timezone"></p>
+                                <p class="text-sm leading-6 text-gray-900 z-10 cursor-help"
+                                   v-text="user.weather.data.timezone"
+                                   :title="'Timezone of the user. To be replaced later with the actual area name by using Reverse Geo Location API.'"
+                                ></p>
+
                                 <div class="mt-1 text-xs leading-5 text-gray-500">
                                     <span>{{ user.weather.data.currentTemp }} (kelvin)</span>,
                                     <span class="capitalize" v-text="user.weather.data.currentWeatherDesc"></span>
@@ -70,4 +91,6 @@ export default {
             </li>
         </ul>
     </div>
+
+    <WeatherDetailsModal v-if="user" :weather="user.weather" v-on:closing="this.user = null" />
 </template>

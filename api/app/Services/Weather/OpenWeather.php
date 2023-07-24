@@ -51,7 +51,8 @@ class OpenWeather extends Weather implements WeatherApi
             longitude: $data->lon,
             timezone: $data->timezone,
             currentTemp: $data->current['temp'],
-            currentWeatherDesc: $data->current['weather'][0]['description']
+            currentWeatherDesc: $data->current['weather'][0]['description'],
+            daily: $data->daily[0],
         );
     }
 }
