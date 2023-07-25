@@ -2,9 +2,9 @@
 
 namespace App\Services\Weather;
 
-use Exception;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 class OpenWeatherOneCall extends Weather implements WeatherApi
 {
@@ -22,7 +22,7 @@ class OpenWeatherOneCall extends Weather implements WeatherApi
         ]);
 
         if ($response->failed()) {
-            throw new Exception(
+            throw new RuntimeException(
                 "The Open Weather API request failed with status code {$response->status()}. " .
                 "The API responded with this message: `{$response->json('message')}`."
             );

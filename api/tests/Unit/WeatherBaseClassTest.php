@@ -6,7 +6,7 @@ use App\Services\Weather\Weather;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-class WeatherTest extends TestCase
+class WeatherBaseClassTest extends TestCase
 {
     protected ReflectionClass $weather;
 
