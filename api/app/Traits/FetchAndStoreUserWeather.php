@@ -11,8 +11,8 @@ trait FetchAndStoreUserWeather
     protected function fetchAndStoreWeatherData(User $user, WeatherApi $weatherApi): void
     {
         $weatherData = $weatherApi
-            ->latitude($user->latitude)
-            ->longitude($user->longitude)
+            ->setLatitude($user->latitude)
+            ->setLongitude($user->longitude)
             ->getWeatherData();
 
         $stored = (new StoreUserWeather)->execute($user, $weatherData);

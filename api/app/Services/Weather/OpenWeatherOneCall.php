@@ -6,23 +6,12 @@ use Exception;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
-class OpenWeather extends Weather implements WeatherApi
+class OpenWeatherOneCall extends Weather implements WeatherApi
 {
-    protected string $apiKey;
-
-    protected string $apiUrl;
-
-    public function __construct()
-    {
-        $this->apiKey = config('weather.open-weather.key');
-
-        $this->apiUrl = config('weather.open-weather.url');
-
-        throw_if(
-            ! $this->apiKey,
-            new Exception('Open Weather API key not set. You can set the key in .env as `OPEN_WEATHER_KEY`!')
-        );
-    }
+    public function __construct(
+        protected string $apiKey,
+        protected string $apiUrl,
+    ) {}
 
     public function getWeatherData(): WeatherData
     {

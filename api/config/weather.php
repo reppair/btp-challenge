@@ -2,9 +2,15 @@
 
 return [
 
+    /**
+     * Open Weather API configuration.
+     */
     'open-weather' => [
-        'url' => 'https://api.openweathermap.org/data/3.0/onecall',
         'key' => env('OPEN_WEATHER_KEY'),
+
+        'one-call' => [
+            'url' => 'https://api.openweathermap.org/data/3.0/onecall',
+        ],
     ],
 
 ];

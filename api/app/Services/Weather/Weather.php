@@ -4,21 +4,31 @@ namespace App\Services\Weather;
 
 abstract class Weather
 {
-    protected string $latitude;
+    protected ?string $latitude = null;
 
-    protected string $longitude;
+    protected ?string $longitude = null;
 
-    public function latitude(string $latitude): WeatherApi
+    public function setLatitude(string $latitude): WeatherApi
     {
         $this->latitude = $latitude;
 
         return $this;
     }
 
-    public function longitude(string $longitude): WeatherApi
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLongitude(string $longitude): WeatherApi
     {
         $this->longitude = $longitude;
 
         return $this;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
     }
 }
