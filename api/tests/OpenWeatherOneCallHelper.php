@@ -31,13 +31,13 @@ class OpenWeatherOneCallHelper
         return $instance;
     }
 
-    public function getApiEndpoint(bool $withQueryString = true): string
+    public function getApiEndpoint(bool $withQueryString = false): string
     {
         $url = Config::get('weather.open-weather.one-call.url');
 
         $queryString = "?lat=$this->lat&lon=$this->lon&appid=$this->key";
 
-        return $withQueryString ? $url.$queryString : $url;
+        return $withQueryString ? $url.$queryString : "$url*";
     }
 
     public function successfulResponse(): PromiseInterface

@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Services\Weather\OpenWeatherOneCall;
 use App\Services\Weather\WeatherApi;
 use App\Services\Weather\WeatherData;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 use Tests\OpenWeatherOneCallHelper;
@@ -12,6 +15,8 @@ use Tests\TestCase;
 
 class WeatherServiceTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected WeatherApi $api;
 
     protected OpenWeatherOneCallHelper $apiHelper;
@@ -19,6 +24,8 @@ class WeatherServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        User::factory()->count(5)->create();
 
         $this->apiHelper = OpenWeatherOneCallHelper::make();
 
@@ -36,7 +43,7 @@ class WeatherServiceTest extends TestCase
     /** @test */
     public function it_returns_weather_data(): void
     {
-        Http::fake([$this->apiHelper->getApiEndpoint() => $this->apiHelper->successfulResponse()]);
+        Http::fake([$this->apiHelper->getApiEndpoint(true) => $this->apiHelper->successfulResponse()]);
 
         $weatherData = $this->api
             ->setLatitude($this->apiHelper->lat)
@@ -49,7 +56,7 @@ class WeatherServiceTest extends TestCase
     /** @test */
     public function it_will_throw_an_exception_if_the_api_call_fails(): void
     {
-        Http::fake([$this->apiHelper->getApiEndpoint() => $this->apiHelper->unauthorizedResponse()]);
+        Http::fake([$this->apiHelper->getApiEndpoint(true) => $this->apiHelper->unauthorizedResponse()]);
 
         $this->expectException(RuntimeException::class);
 

@@ -8,17 +8,13 @@ use App\Services\Weather\WeatherApi;
 
 trait FetchAndStoreUserWeather
 {
-    protected function fetchAndStoreWeatherData(User $user, WeatherApi $weatherApi): void
+    protected function fetchAndStoreWeatherData(User $user, WeatherApi $weatherApi): bool
     {
         $weatherData = $weatherApi
             ->setLatitude($user->latitude)
             ->setLongitude($user->longitude)
             ->getWeatherData();
 
-        $stored = (new StoreUserWeather)->execute($user, $weatherData);
-
-        if ($stored) {
-            $this->usersWithFreshWeatherData[] = $user->id;
-        }
+        return (new StoreUserWeather)->execute($user, $weatherData);
     }
 }

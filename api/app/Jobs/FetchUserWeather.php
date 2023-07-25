@@ -20,8 +20,16 @@ class FetchUserWeather implements ShouldQueue
 
     public function handle(WeatherApi $weatherApi): void
     {
-        User::all()->each(fn (User $user) => $this->fetchAndStoreWeatherData($user, $weatherApi));
+        User::all()->each(function (User $user) use ($weatherApi) {
+            $stored = $this->fetchAndStoreWeatherData($user, $weatherApi);
 
-        event(new WeatherUpdated(userIds: $this->usersWithFreshWeatherData));
+            if ($stored) {
+                $this->usersWithFreshWeatherData[] = $user->id;
+            }
+        });
+
+        if ($this->usersWithFreshWeatherData) {
+            event(new WeatherUpdated(userIds: $this->usersWithFreshWeatherData));
+        }
     }
 }
