@@ -41,11 +41,12 @@ class FetchUserWeatherJobTest extends TestCase
     {
         $users = User::factory(5)->create();
 
-        $this->mock(FetchAndStoreUserWeather::class, fn (MockInterface $mock) =>
-            $mock->shouldReceive('execute')->once()->with(
-                Mockery::on(fn (Collection $actual) => $actual->diff($users)->isEmpty()
-            ))
-        );
+        $this->mock(FetchAndStoreUserWeather::class)
+            ->shouldReceive('execute')
+            ->once()
+            ->with(Mockery::on(
+                fn (Collection $actual) => $actual->diff($users)->isEmpty()
+            ));
 
         FetchUserWeather::dispatch();
     }

@@ -78,9 +78,9 @@ class FetchAndStoreUserWeatherTest extends TestCase
 
         Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
 
-        $this->mock(CanStoreUserWeather::class, fn (MockInterface $mock) =>
-            $mock->shouldReceive('execute')->times(3)
-        );
+        $this->mock(CanStoreUserWeather::class)
+            ->shouldReceive('execute')
+            ->times(3);
 
         $this->app[FetchAndStoreUserWeather::class]->execute($users);
     }
@@ -94,9 +94,10 @@ class FetchAndStoreUserWeatherTest extends TestCase
 
         Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
 
-        $this->mock(CanStoreUserWeather::class, fn (MockInterface $mock) =>
-            $mock->shouldReceive('execute')->times(3)->andReturn(true)
-        );
+        $this->mock(CanStoreUserWeather::class)
+            ->shouldReceive('execute')
+            ->times(3)
+            ->andReturn(true);
 
         $updatedWeatherForUserIds = $this->app[FetchAndStoreUserWeather::class]->execute($users);
 

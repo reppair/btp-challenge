@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\StoreUserWeather;
-use App\Events\WeatherUpdated;
+use App\Actions\FetchAndStoreUserWeather;
 use App\Models\User;
-use App\Services\Weather\WeatherApi;
 use Illuminate\Console\Command;
 
 class FetchUserWeather extends Command
@@ -16,23 +14,20 @@ class FetchUserWeather extends Command
 
     protected array $usersWithFreshWeatherData = [];
 
-    public function handle(WeatherApi $weatherApi): int
+    public function handle(FetchAndStoreUserWeather $fetchAndStoreUserWeather): int
     {
-        $this->line('Fetching weather data for our users...');
+        $users = User::all();
 
-//        $this->withProgressBar(User::all(), function (User $user) use ($weatherApi) {
-//            $stored = $this->fetchAndStoreWeatherData($user, $weatherApi, new StoreUserWeather);
-//
-//            if ($stored) {
-//                $this->usersWithFreshWeatherData[] = $user->id;
-//            }
-//        });
+        if ($users->isEmpty()) {
+            $this->error('We have no users! :(');
+            return Command::FAILURE;
+        }
 
-        $this->newLine();
+        $this->info("Fetching weather data for {$users->count()} users. It might take a bit!");
 
-        event(new WeatherUpdated(userIds: $this->usersWithFreshWeatherData));
+        $usersWithFreshWeatherData = $fetchAndStoreUserWeather->execute($users);
 
-        if (count($this->usersWithFreshWeatherData) != User::count()) {
+        if ($users->count() != count($usersWithFreshWeatherData)) {
             $this->error('Could not fetch weather data for some users, please try running the command again.');
             return Command::FAILURE;
         }
