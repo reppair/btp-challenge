@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Actions\StoreUserWeather;
+use App\Actions\CanStoreUserWeather;
 use App\Models\User;
 use App\Services\Weather\WeatherApi;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +10,7 @@ use RuntimeException;
 
 trait FetchAndStoreUserWeather
 {
-    protected function fetchAndStoreWeatherData(User $user, WeatherApi $weatherApi): bool
+    public function fetchAndStoreWeatherData(User $user, WeatherApi $weatherApi, CanStoreUserWeather $action): bool
     {
         try {
             $weatherData = $weatherApi
@@ -22,7 +22,6 @@ trait FetchAndStoreUserWeather
             return false;
         }
 
-
-        return (new StoreUserWeather)->execute($user, $weatherData);
+        return $action->execute($user, $weatherData);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\StoreUserWeather;
 use App\Events\WeatherUpdated;
 use App\Models\User;
 use App\Services\Weather\WeatherApi;
@@ -21,7 +22,7 @@ class FetchUserWeather implements ShouldQueue
     public function handle(WeatherApi $weatherApi): void
     {
         User::all()->each(function (User $user) use ($weatherApi) {
-            $stored = $this->fetchAndStoreWeatherData($user, $weatherApi);
+            $stored = $this->fetchAndStoreWeatherData($user, $weatherApi, new StoreUserWeather);
 
             if ($stored) {
                 $this->usersWithFreshWeatherData[] = $user->id;

@@ -2,13 +2,17 @@
 
 namespace Tests\Feature;
 
+use App\Actions\StoreUserWeather;
 use App\Events\WeatherUpdated;
 use App\Jobs\FetchUserWeather;
 use App\Models\User;
+use App\Services\Weather\WeatherApi;
+use App\Traits\FetchAndStoreUserWeather;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Tests\OpenWeatherOneCallHelper;
 use Tests\TestCase;
@@ -66,5 +70,51 @@ class FetchUserWeatherJobTest extends TestCase
         FetchUserWeather::dispatch();
 
         Event::assertNotDispatched(WeatherUpdated::class);
+    }
+
+    /** @test */
+    public function it_will_catch_the_weather_api_runtime_exception_and_return_false(): void
+    {
+        $helper = OpenWeatherOneCallHelper::make();
+
+        Http::fake([$helper->getApiEndpoint() => $helper->unauthorizedResponse()]);
+
+        $instance = new class {
+            use FetchAndStoreUserWeather;
+        };
+
+        $spy = Log::spy();
+
+        $this->assertFalse($instance->fetchAndStoreWeatherData(
+            user: User::factory()->create(),
+            weatherApi: $this->app[WeatherApi::class],
+            action: new StoreUserWeather,
+        ));
+
+        $spy->shouldHaveReceived('error');
+    }
+
+    /** @test */
+    public function it_will_execute_an_action_class_and_return_the_result(): void
+    {
+        $helper = OpenWeatherOneCallHelper::make();
+
+        Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
+
+        $instance = new class {
+            use FetchAndStoreUserWeather;
+        };
+
+        $actionMock = $this->getMockBuilder(StoreUserWeather::class)->getMock();
+
+        $actionMock->expects($this->once())
+            ->method('execute')
+            ->willReturn(true);
+
+        $this->assertTrue($instance->fetchAndStoreWeatherData(
+            user: User::factory()->create(),
+            weatherApi: $this->app[WeatherApi::class],
+            action: $actionMock,
+        ));
     }
 }
