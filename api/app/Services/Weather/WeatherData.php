@@ -2,7 +2,9 @@
 
 namespace App\Services\Weather;
 
-class WeatherData
+use Illuminate\Contracts\Support\Arrayable;
+
+class WeatherData implements Arrayable
 {
     /**
      * A simple DTO? Sure, why not.
@@ -24,5 +26,10 @@ class WeatherData
         // todo: validation goodness here...
 
         return true;
+    }
+
+    public function toArray(): array
+    {
+        return (array) $this;
     }
 }
