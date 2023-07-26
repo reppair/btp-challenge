@@ -2,19 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Actions\StoreUserWeather;
-use App\Events\WeatherUpdated;
+use App\Actions\FetchAndStoreUserWeather;
 use App\Jobs\FetchUserWeather;
 use App\Models\User;
-use App\Services\Weather\WeatherApi;
-use App\Traits\FetchAndStoreUserWeather;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
-use Tests\OpenWeatherOneCallHelper;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\TestCase;
 
 class FetchUserWeatherJobTest extends TestCase
@@ -41,80 +37,16 @@ class FetchUserWeatherJobTest extends TestCase
     }
 
     /** @test */
-    public function it_will_fetch_and_store_user_weather(): void
+    public function it_will_call_an_action_class_to_do_the_work(): void
     {
-        User::factory()->count(5)->create();
+        $users = User::factory(5)->create();
 
-        $helper = OpenWeatherOneCallHelper::make();
-
-        Event::fake();
-
-        Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
+        $this->mock(FetchAndStoreUserWeather::class, fn (MockInterface $mock) =>
+            $mock->shouldReceive('execute')->once()->with(
+                Mockery::on(fn (Collection $actual) => $actual->diff($users)->isEmpty()
+            ))
+        );
 
         FetchUserWeather::dispatch();
-
-        Event::assertDispatched(WeatherUpdated::class);
-    }
-
-    /** @test */
-    public function it_wont_fire_a_weather_updated_event_if_no_weather_updates_were_stored(): void
-    {
-        User::factory()->count(5)->create();
-
-        $helper = OpenWeatherOneCallHelper::make();
-
-        Event::fake();
-
-        Http::fake([$helper->getApiEndpoint() => $helper->unauthorizedResponse()]);
-
-        FetchUserWeather::dispatch();
-
-        Event::assertNotDispatched(WeatherUpdated::class);
-    }
-
-    /** @test */
-    public function it_will_catch_the_weather_api_runtime_exception_and_return_false(): void
-    {
-        $helper = OpenWeatherOneCallHelper::make();
-
-        Http::fake([$helper->getApiEndpoint() => $helper->unauthorizedResponse()]);
-
-        $instance = new class {
-            use FetchAndStoreUserWeather;
-        };
-
-        $spy = Log::spy();
-
-        $this->assertFalse($instance->fetchAndStoreWeatherData(
-            user: User::factory()->create(),
-            weatherApi: $this->app[WeatherApi::class],
-            action: new StoreUserWeather,
-        ));
-
-        $spy->shouldHaveReceived('error');
-    }
-
-    /** @test */
-    public function it_will_execute_an_action_class_and_return_the_result(): void
-    {
-        $helper = OpenWeatherOneCallHelper::make();
-
-        Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
-
-        $instance = new class {
-            use FetchAndStoreUserWeather;
-        };
-
-        $actionMock = $this->getMockBuilder(StoreUserWeather::class)->getMock();
-
-        $actionMock->expects($this->once())
-            ->method('execute')
-            ->willReturn(true);
-
-        $this->assertTrue($instance->fetchAndStoreWeatherData(
-            user: User::factory()->create(),
-            weatherApi: $this->app[WeatherApi::class],
-            action: $actionMock,
-        ));
     }
 }

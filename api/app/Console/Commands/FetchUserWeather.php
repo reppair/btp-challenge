@@ -2,16 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\StoreUserWeather;
 use App\Events\WeatherUpdated;
 use App\Models\User;
 use App\Services\Weather\WeatherApi;
-use App\Traits\FetchAndStoreUserWeather;
 use Illuminate\Console\Command;
 
 class FetchUserWeather extends Command
 {
-    use FetchAndStoreUserWeather;
-
     protected $signature = 'fetch-weather';
 
     protected $description = 'Running this command will fetch weather data for our users from external API.';
@@ -22,7 +20,13 @@ class FetchUserWeather extends Command
     {
         $this->line('Fetching weather data for our users...');
 
-        $this->withProgressBar(User::all(), fn (User $user) => $this->fetchAndStoreWeatherData($user, $weatherApi));
+//        $this->withProgressBar(User::all(), function (User $user) use ($weatherApi) {
+//            $stored = $this->fetchAndStoreWeatherData($user, $weatherApi, new StoreUserWeather);
+//
+//            if ($stored) {
+//                $this->usersWithFreshWeatherData[] = $user->id;
+//            }
+//        });
 
         $this->newLine();
 
