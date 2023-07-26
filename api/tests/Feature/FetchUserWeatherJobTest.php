@@ -39,8 +39,7 @@ class FetchUserWeatherJobTest extends TestCase
     /** @test */
     public function it_will_fetch_and_store_user_weather(): void
     {
-        $this->assertDatabaseCount('users', 0);
-        $this->assertDatabaseCount('user_weather', 0);
+        User::factory()->count(5)->create();
 
         $helper = OpenWeatherOneCallHelper::make();
 
@@ -50,14 +49,22 @@ class FetchUserWeatherJobTest extends TestCase
 
         FetchUserWeather::dispatch();
 
-        Event::assertNotDispatched(WeatherUpdated::class);
+        Event::assertDispatched(WeatherUpdated::class);
+    }
 
+    /** @test */
+    public function it_wont_fire_a_weather_updated_event_if_no_weather_updates_were_stored(): void
+    {
         User::factory()->count(5)->create();
+
+        $helper = OpenWeatherOneCallHelper::make();
+
+        Event::fake();
+
+        Http::fake([$helper->getApiEndpoint() => $helper->unauthorizedResponse()]);
 
         FetchUserWeather::dispatch();
 
-        $this->assertDatabaseCount('user_weather', 5);
-
-        Event::assertDispatched(WeatherUpdated::class);
+        Event::assertNotDispatched(WeatherUpdated::class);
     }
 }

@@ -16,7 +16,7 @@ class FetchUserWeather implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, FetchAndStoreUserWeather;
 
-    protected array $usersWithFreshWeatherData = [];
+    public array $usersWithFreshWeatherData = [];
 
     public function handle(WeatherApi $weatherApi): void
     {
