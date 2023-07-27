@@ -1,51 +1,37 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Actions\FetchAndStoreUserWeather;
-use App\Console\Commands\FetchUserWeather;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
-use Mockery\MockInterface;
 use Tests\OpenWeatherOneCallHelper;
 use Tests\TestCase;
 
-class FetchWeatherCommandTest extends TestCase
-{
-    use RefreshDatabase;
+uses(TestCase::class, RefreshDatabase::class);
 
-    /** @test */
-    public function it_will_fail_without_users(): void
-    {
-        OpenWeatherOneCallHelper::make();
+it('will fail without users', function () {
+    OpenWeatherOneCallHelper::make();
 
-        $this->artisan('fetch-weather')->assertFailed();
-    }
+    $this->artisan('fetch-weather')->assertFailed();
+});
 
-    /** @test */
-    public function it_will_delegate_the_work_to_an_action(): void
-    {
-        $users = User::factory()->count(5)->create();
+it('will delegate the work to an action', function () {
+    $users = User::factory()->count(5)->create();
 
-        $this->mock(FetchAndStoreUserWeather::class)
-            ->shouldReceive('execute')
-            ->once()
-            ->andReturn($users->pluck('id')->toArray());
+    $this->mock(FetchAndStoreUserWeather::class)
+        ->shouldReceive('execute')
+        ->once()
+        ->andReturn($users->pluck('id')->toArray());
 
-        $this->artisan('fetch-weather')->assertSuccessful();
-    }
+    $this->artisan('fetch-weather')->assertSuccessful();
+});
 
-    /** @test */
-    public function it_will_fail_if_the_action_doesnt_return_the_same_amount_of_user_ids(): void
-    {
-        $users = User::factory()->count(5)->create();
+it('will fail if the action doesnt return the same amount of user ids', function () {
+    $users = User::factory()->count(5)->create();
 
-        $this->mock(FetchAndStoreUserWeather::class)
-            ->shouldReceive('execute')
-            ->once()
-            ->andReturn($users->pluck('id')->reject(fn ($id) => $id == 1)->toArray());
+    $this->mock(FetchAndStoreUserWeather::class)
+        ->shouldReceive('execute')
+        ->once()
+        ->andReturn($users->pluck('id')->reject(fn ($id) => $id == 1)->toArray());
 
-        $this->artisan('fetch-weather')->assertFailed();
-    }
-}
+    $this->artisan('fetch-weather')->assertFailed();
+});

@@ -1,61 +1,43 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
 use App\Models\UserWeather;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
-class AppTest extends TestCase
-{
-    use RefreshDatabase;
+uses(TestCase::class, RefreshDatabase::class);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function () {
+    User::factory(20)->create();
+});
 
-        User::factory(20)->create();
-    }
+test('the application returns a successful response', function () {
+    $response = $this->get('/');
 
-    /** @test */
-    public function the_application_returns_a_successful_response(): void
-    {
-        $response = $this->get('/');
+    $response->assertStatus(200);
+});
 
-        $response->assertStatus(200);
-    }
+test('database works', function () {
+    expect(User::all()->count())
+        ->toEqual(20)
+        ->and(UserWeather::all()->count())
+        ->toEqual(0);
+});
 
-    /** @test */
-    public function database_works(): void
-    {
-        $this->assertEquals(20, User::all()->count());
+it('returns a list of users', function () {
+    $this->getJson('/')
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->has('users', 20)
+                ->where('users.0.weather', null));
+});
 
-        // we don't really want to seed that table right now
-        $this->assertEquals(0, UserWeather::all()->count());
-    }
+test('user weather is included by default', function () {
+    User::each(fn (User $user) => UserWeather::factory()->for($user)->create());
 
-    /** @test */
-    public function it_returns_a_list_of_users(): void
-    {
-        $this->getJson('/')
-            ->assertJson(fn (AssertableJson $json) =>
-                $json->has('users', 20)
-                    ->where('users.0.weather', null)
-            );
-    }
-
-    /** @test */
-    public function user_weather_is_included_by_default(): void
-    {
-        User::each(fn (User $user) => UserWeather::factory()->for($user)->create());
-
-        $this->getJson('/')
-            ->assertJson(fn (AssertableJson $json) =>
-                $json->has('users', 20)
-                    ->where('users.19.weather.id', 20)
-                    ->where('users.19.weather.data', fn ($data) => $data !== null)
-            );
-    }
-}
+    $this->getJson('/')
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->has('users', 20)
+                ->where('users.19.weather.id', 20)
+                ->where('users.19.weather.data', fn ($data) => $data !== null));
+});

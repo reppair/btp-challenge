@@ -1,60 +1,40 @@
 <?php
 
-namespace Tests\Unit;
-
 use App\Services\Weather\OpenWeatherOneCall;
 use App\Services\Weather\WeatherApi;
 use App\Services\Weather\WeatherData;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
-class OpenWeatherOneCallTest extends TestCase
-{
-    public WeatherApi $api;
+beforeEach(function () {
+    $this->api = new OpenWeatherOneCall(
+        apiKey: 'open-weather-api-key',
+        apiUrl: 'https://api.openweathermap.org/data/3.0/onecall',
+    );
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('will get and set latitude', function () {
+    expect($this->api->getLatitude())->toBeNull();
 
-        $this->api = new OpenWeatherOneCall(
-            apiKey: 'open-weather-api-key',
-            apiUrl: 'https://api.openweathermap.org/data/3.0/onecall',
-        );
-    }
+    $this->api->setLatitude('lat');
 
-    /** @test */
-    public function it_will_get_and_set_latitude(): void
-    {
-        $this->assertNull($this->api->getLatitude());
+    expect($this->api->getLatitude())->toBe('lat');
+});
 
-        $this->api->setLatitude('lat');
+it('will get and set longitude', function () {
+    expect($this->api->getLongitude())->toBeNull();
 
-        $this->assertSame('lat', $this->api->getLatitude());
-    }
+    $this->api->setLongitude('lon');
 
-    /** @test */
-    public function it_will_get_and_set_longitude(): void
-    {
-        $this->assertNull($this->api->getLongitude());
+    expect($this->api->getLongitude())->toBe('lon');
+});
 
-        $this->api->setLongitude('lon');
+it('implements the get weather data method', function () {
+    expect(method_exists($this->api, 'getWeatherData'))->toBeTrue();
+});
 
-        $this->assertSame('lon', $this->api->getLongitude());
-    }
+test('get weather return weather data object', function () {
+    $reflection = new ReflectionClass($this->api);
 
-    /** @test */
-    public function it_implements_the_get_weather_data_method(): void
-    {
-        $this->assertTrue(method_exists($this->api, 'getWeatherData'));
-    }
+    $returnType = $reflection->getMethod('getWeatherData')->getReturnType()->getName();
 
-    /** @test */
-    public function get_weather_return_weather_data_object(): void
-    {
-        $reflection = new ReflectionClass($this->api);
-
-        $returnType = $reflection->getMethod('getWeatherData')->getReturnType()->getName();
-
-        $this->assertSame(WeatherData::class, $returnType);
-    }
-}
+    expect($returnType)->toBe(WeatherData::class);
+});

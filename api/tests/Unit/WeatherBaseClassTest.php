@@ -1,25 +1,13 @@
 <?php
 
-namespace Tests\Unit;
-
 use App\Services\Weather\Weather;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 
-class WeatherBaseClassTest extends TestCase
-{
-    protected ReflectionClass $weather;
+beforeEach(function () {
+    $this->weather = new ReflectionClass(Weather::class);
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('is an abstract class', function () {
+    expect($this->weather->isAbstract())->toBeTrue();
+});
 
-        $this->weather = new ReflectionClass(Weather::class);
-    }
-
-    /** @test */
-    public function it_is_an_abstract_class(): void
-    {
-        $this->assertTrue($this->weather->isAbstract());
-    }
-}
+it('Expect Pest PHP to be awesome!', fn () => expect('awesome')->toBeAwesome());

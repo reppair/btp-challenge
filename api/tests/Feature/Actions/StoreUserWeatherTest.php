@@ -1,7 +1,5 @@
 <?php
 
-namespace Tests\Feature\Actions;
-
 use App\Actions\FetchAndStoreUserWeather;
 use App\Actions\StoreUserWeather;
 use App\Models\User;
@@ -12,47 +10,40 @@ use Illuminate\Support\Facades\Http;
 use Tests\OpenWeatherOneCallHelper;
 use Tests\TestCase;
 
-class StoreUserWeatherTest extends TestCase
-{
-    use RefreshDatabase;
+uses(TestCase::class, RefreshDatabase::class);
 
-    /** @test */
-    public function it_will_create_user_weather_record_if_it_doesnt_exist(): void
-    {
-        $helper = OpenWeatherOneCallHelper::make();
+it('will create user weather record if it doesnt exist', function () {
+    $helper = OpenWeatherOneCallHelper::make();
 
-        Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
+    Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
 
-        $user = User::factory()->create();
+    $user = User::factory()->create();
 
-        $weatherData = $this->app[FetchAndStoreUserWeather::class]->fetchWeatherData($user);
+    $weatherData = $this->app[FetchAndStoreUserWeather::class]->fetchWeatherData($user);
 
-        $this->assertDatabaseCount('user_weather', 0);
+    $this->assertDatabaseCount('user_weather', 0);
 
-        $this->assertTrue($this->app[StoreUserWeather::class]->execute($user, $weatherData));
+    expect($this->app[StoreUserWeather::class]->execute($user, $weatherData))->toBeTrue();
 
-        $this->assertDatabaseCount('user_weather', 1);
-    }
+    $this->assertDatabaseCount('user_weather', 1);
+});
 
-    /** @test */
-    public function it_will_update_the_existing_user_weather_record_for_a_user(): void
-    {
-        $helper = OpenWeatherOneCallHelper::make();
+it('will update the existing user weather record for a user', function () {
+    $helper = OpenWeatherOneCallHelper::make();
 
-        Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
+    Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
 
-        $user = User::factory()->has(UserWeather::factory(), 'weather')->create();
+    $user = User::factory()->has(UserWeather::factory(), 'weather')->create();
 
-        $weatherData = $this->app[FetchAndStoreUserWeather::class]->fetchWeatherData($user);
+    $weatherData = $this->app[FetchAndStoreUserWeather::class]->fetchWeatherData($user);
 
-        $this->assertDatabaseCount('user_weather', 1);
+    $this->assertDatabaseCount('user_weather', 1);
 
-        $this->assertNotEquals($user->weather->data, $weatherData->toArray());
+    $this->assertNotEquals($user->weather->data, $weatherData->toArray());
 
-        $this->assertTrue($this->app[StoreUserWeather::class]->execute($user, $weatherData));
+    expect($this->app[StoreUserWeather::class]->execute($user, $weatherData))->toBeTrue();
 
-        $this->assertDatabaseCount('user_weather', 1);
+    $this->assertDatabaseCount('user_weather', 1);
 
-        $this->assertEquals($user->weather->fresh()->data, $weatherData->toArray());
-    }
-}
+    expect($weatherData->toArray())->toEqual($user->weather->fresh()->data);
+});

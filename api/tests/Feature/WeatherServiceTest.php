@@ -1,74 +1,54 @@
 <?php
 
-namespace Tests\Feature;
-
 use App\Models\User;
 use App\Services\Weather\OpenWeatherOneCall;
 use App\Services\Weather\WeatherApi;
 use App\Services\Weather\WeatherData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
-use RuntimeException;
 use Tests\OpenWeatherOneCallHelper;
 use Tests\TestCase;
 
-class WeatherServiceTest extends TestCase
-{
-    use RefreshDatabase;
+uses(TestCase::class, RefreshDatabase::class);
 
-    protected WeatherApi $api;
+beforeEach(function () {
+    User::factory()->count(5)->create();
 
-    protected OpenWeatherOneCallHelper $apiHelper;
+    $this->apiHelper = OpenWeatherOneCallHelper::make();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $this->api = app('App\Services\Weather\WeatherApi');
+});
 
-        User::factory()->count(5)->create();
+it('resolves a weather service implementation', function () {
+    expect($this->api)
+        ->toBeInstanceOf(WeatherApi::class)
+        ->toBeInstanceOf(OpenWeatherOneCall::class);
+});
 
-        $this->apiHelper = OpenWeatherOneCallHelper::make();
+it('returns weather data', function () {
+    Http::fake([$this->apiHelper->getApiEndpoint(true) => $this->apiHelper->successfulResponse()]);
 
-        $this->api = app('App\Services\Weather\WeatherApi');
-    }
+    $weatherData = $this->api
+        ->setLatitude($this->apiHelper->lat)
+        ->setLongitude($this->apiHelper->lon)
+        ->getWeatherData();
 
-    /** @test */
-    public function it_resolves_a_weather_service_implementation(): void
-    {
-        $this->assertInstanceOf(WeatherApi::class, $this->api);
+    expect($weatherData)->toBeInstanceOf(WeatherData::class);
+});
 
-        $this->assertInstanceOf(OpenWeatherOneCall::class, $this->api);
-    }
+it('will throw an exception if the api call fails', function () {
+    Http::fake([$this->apiHelper->getApiEndpoint(true) => $this->apiHelper->unauthorizedResponse()]);
 
-    /** @test */
-    public function it_returns_weather_data(): void
-    {
-        Http::fake([$this->apiHelper->getApiEndpoint(true) => $this->apiHelper->successfulResponse()]);
+    $this->expectException(RuntimeException::class);
 
-        $weatherData = $this->api
-            ->setLatitude($this->apiHelper->lat)
-            ->setLongitude($this->apiHelper->lon)
-            ->getWeatherData();
+    $this->expectExceptionCode(0);
 
-        $this->assertInstanceOf(WeatherData::class, $weatherData);
-    }
+    $this->expectExceptionMessage('status code 403');
 
-    /** @test */
-    public function it_will_throw_an_exception_if_the_api_call_fails(): void
-    {
-        Http::fake([$this->apiHelper->getApiEndpoint(true) => $this->apiHelper->unauthorizedResponse()]);
+    $this->expectExceptionMessage('unauthorized');
 
-        $this->expectException(RuntimeException::class);
-
-        $this->expectExceptionCode(0);
-
-        $this->expectExceptionMessage('status code 403');
-
-        $this->expectExceptionMessage('unauthorized');
-
-        $this->api
-            ->setLatitude($this->apiHelper->lat)
-            ->setLongitude($this->apiHelper->lon)
-            ->getWeatherData();
-    }
-}
+    $this->api
+        ->setLatitude($this->apiHelper->lat)
+        ->setLongitude($this->apiHelper->lon)
+        ->getWeatherData();
+});
