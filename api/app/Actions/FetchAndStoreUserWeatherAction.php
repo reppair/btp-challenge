@@ -10,15 +10,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
-class FetchAndStoreUserWeather
+class FetchAndStoreUserWeatherAction
 {
     protected WeatherApi $api;
 
     public array $usersWithFreshWeatherData = [];
 
-    protected CanStoreUserWeather|StoreUserWeather $storeAction;
+    protected CanStoreUserWeather|StoreUserWeatherAction $storeAction;
 
-    public function __construct(WeatherApi $api, CanStoreUserWeather $storeAction = new StoreUserWeather)
+    public function __construct(WeatherApi $api, CanStoreUserWeather $storeAction = new StoreUserWeatherAction)
     {
         $this->api = $api;
         $this->storeAction = $storeAction;

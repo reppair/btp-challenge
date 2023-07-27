@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\FetchAndStoreUserWeather;
+use App\Actions\FetchAndStoreUserWeatherAction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\OpenWeatherOneCallHelper;
@@ -17,7 +17,7 @@ it('will fail without users', function () {
 it('will delegate the work to an action', function () {
     $users = User::factory()->count(5)->create();
 
-    $this->mock(FetchAndStoreUserWeather::class)
+    $this->mock(FetchAndStoreUserWeatherAction::class)
         ->shouldReceive('execute')
         ->once()
         ->andReturn($users->pluck('id')->toArray());
@@ -28,7 +28,7 @@ it('will delegate the work to an action', function () {
 it('will fail if the action doesnt return the same amount of user ids', function () {
     $users = User::factory()->count(5)->create();
 
-    $this->mock(FetchAndStoreUserWeather::class)
+    $this->mock(FetchAndStoreUserWeatherAction::class)
         ->shouldReceive('execute')
         ->once()
         ->andReturn($users->pluck('id')->reject(fn ($id) => $id == 1)->toArray());

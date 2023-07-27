@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Services\Weather\WeatherData;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class StoreUserWeather implements CanStoreUserWeather
+class StoreUserWeatherAction implements CanStoreUserWeather
 {
     public function execute(User|Authenticatable $user, WeatherData $data): bool
     {

@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\FetchAndStoreUserWeather;
+use App\Actions\FetchAndStoreUserWeatherAction;
 use App\Jobs\FetchUserWeather;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,7 +32,7 @@ it('gets dispatched by the scheduler', function () {
 it('will call an action class to do the work', function () {
     $users = User::factory(5)->create();
 
-    $this->mock(FetchAndStoreUserWeather::class)
+    $this->mock(FetchAndStoreUserWeatherAction::class)
         ->shouldReceive('execute')
         ->once()
         ->with(Mockery::on(

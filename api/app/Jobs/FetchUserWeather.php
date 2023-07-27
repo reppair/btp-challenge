@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\User;
-use App\Actions\FetchAndStoreUserWeather;
+use App\Actions\FetchAndStoreUserWeatherAction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -14,7 +14,7 @@ class FetchUserWeather implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function handle(FetchAndStoreUserWeather $fetchAndStoreUserWeather): void
+    public function handle(FetchAndStoreUserWeatherAction $fetchAndStoreUserWeather): void
     {
         $fetchAndStoreUserWeather->execute(User::all());
     }

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\FetchAndStoreUserWeather;
+use App\Actions\FetchAndStoreUserWeatherAction;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -14,7 +14,7 @@ class FetchUserWeather extends Command
 
     protected array $usersWithFreshWeatherData = [];
 
-    public function handle(FetchAndStoreUserWeather $fetchAndStoreUserWeather): int
+    public function handle(FetchAndStoreUserWeatherAction $fetchAndStoreUserWeather): int
     {
         $users = User::all();
 
