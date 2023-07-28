@@ -33,15 +33,19 @@ class OpenWeatherOneCall extends Weather implements WeatherApi
 
     protected function weatherDataFromResponse(Response $response): WeatherData
     {
-        $data = (object) $response->json();
-
         return new WeatherData(
-            latitude: $data->lat,
-            longitude: $data->lon,
-            timezone: $data->timezone,
-            currentTemp: $data->current['temp'],
-            currentWeatherDesc: $data->current['weather'][0]['description'],
-            daily: $data->daily[0],
+            timezone: $response->json('timezone'),
+            currentTemp: $response->json('current.temp'),
+            currentUvi: $response->json('current.uvi'),
+            currentWindSpeed: $response->json('current.wind_speed'),
+            currentWeatherDesc: $response->json('current.weather.0.description'),
+            dailyTempMin: $response->json('daily.0.temp.min'),
+            dailyTempMax: $response->json('daily.0.temp.max'),
+            dailyTempDay: $response->json('daily.0.temp.day'),
+            dailyTempNight: $response->json('daily.0.temp.night'),
+            dailyUvi: $response->json('daily.0.uvi'),
+            dailyWindSpeed: $response->json('daily.0.wind_speed'),
+            dailySummary: $response->json('daily.0.summary'),
         );
     }
 }

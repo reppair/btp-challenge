@@ -33,7 +33,7 @@ it('will update the existing user weather record for a user', function () {
 
     Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
 
-    $user = User::factory()->has(UserWeather::factory(), 'weather')->create();
+    $user = User::factory()->has(UserWeather::factory()->withoutData(), 'weather')->create();
 
     $weatherData = $this->app[FetchAndStoreUserWeatherAction::class]->fetchWeatherData($user);
 
