@@ -5,7 +5,6 @@ use App\Actions\StoreUserWeatherAction;
 use App\Models\User;
 use App\Models\UserWeather;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Http;
 use Tests\OpenWeatherOneCallHelper;
 use Tests\TestCase;
@@ -33,17 +32,20 @@ it('will update the existing user weather record for a user', function () {
 
     Http::fake([$helper->getApiEndpoint() => $helper->successfulResponse()]);
 
-    $user = User::factory()->has(UserWeather::factory()->withoutData(), 'weather')->create();
+    $user = User::factory()->has(UserWeather::factory(), 'weather')->create();
+
+    $user->weather->data->dailySummary = 'testing';
+    $user->weather->save();
 
     $weatherData = $this->app[FetchAndStoreUserWeatherAction::class]->fetchWeatherData($user);
 
     $this->assertDatabaseCount('user_weather', 1);
 
-    $this->assertNotEquals($user->weather->data, $weatherData->toArray());
+    $this->assertNotEquals($user->weather->data->toArray(), $weatherData->toArray());
 
     expect($this->app[StoreUserWeatherAction::class]->execute($user, $weatherData))->toBeTrue();
 
     $this->assertDatabaseCount('user_weather', 1);
 
-    expect($weatherData->toArray())->toEqual($user->weather->fresh()->data);
+    expect($weatherData->toArray())->toEqual($user->weather->fresh()->data->toArray());
 });

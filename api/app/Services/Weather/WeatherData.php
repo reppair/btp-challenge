@@ -7,18 +7,18 @@ use Illuminate\Contracts\Support\Arrayable;
 class WeatherData implements Arrayable
 {
     public function __construct(
-        public readonly string $timezone,
-        public readonly float $currentTemp,
-        public readonly float $currentUvi,
-        public readonly float $currentWindSpeed,
-        public readonly string $currentWeatherDesc,
-        public readonly float $dailyTempMin,
-        public readonly float $dailyTempMax,
-        public readonly float $dailyTempDay,
-        public readonly float $dailyTempNight,
-        public readonly float $dailyUvi,
-        public readonly float $dailyWindSpeed,
-        public readonly string $dailySummary,
+        public string $timezone,
+        public float $currentTemp,
+        public float $currentUvi,
+        public float $currentWindSpeed,
+        public string $currentWeatherDesc,
+        public float $dailyTempMin,
+        public float $dailyTempMax,
+        public float $dailyTempDay,
+        public float $dailyTempNight,
+        public float $dailyUvi,
+        public float $dailyWindSpeed,
+        public string $dailySummary,
     ) {}
 
     public function isValid(): bool
