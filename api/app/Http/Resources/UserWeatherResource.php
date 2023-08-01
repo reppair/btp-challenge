@@ -7,11 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserWeatherResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
         /** @var $data \App\Services\Weather\WeatherData */
@@ -19,6 +14,7 @@ class UserWeatherResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'user_id' => $this->user_id,
             'timezone' => $data->timezone,
             'current_temp' => $data->currentTemp,
             'current_uvi' => $data->currentUvi,

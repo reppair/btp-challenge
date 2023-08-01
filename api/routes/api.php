@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GetUsersController;
+use App\Http\Controllers\GetUserWeatherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,3 +34,4 @@ Route::get('/', function (Request $request) {
 });
 
 Route::get('users', GetUsersController::class)->name('users.index');
+Route::get('user-weather', GetUserWeatherController::class)->name('user-weather.index');

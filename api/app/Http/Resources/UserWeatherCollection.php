@@ -10,6 +10,14 @@ class UserWeatherCollection extends ResourceCollection
 {
     public function toArray(Request $request): array
     {
-        return [];
+        return [
+            'data' => $this->collection,
+            'links' => [
+                'index' => route('user-weather.index'),
+                'create' => null,
+                'update' => null,
+                'delete' => null,
+            ],
+        ];
     }
 }

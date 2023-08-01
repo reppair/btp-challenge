@@ -10,7 +10,7 @@ class GetUsersController extends Controller
 {
     public function __invoke(Request $request): UserCollection
     {
-        // todo: replace with a repository or a dedicated action class? Whatever KISS (for now).
+        // todo: replace with a repository or a dedicated action class? Whatever, KISS (for now).
         $users = User::query();
 
         if ($request->has('with') && $request->with == 'weather') {

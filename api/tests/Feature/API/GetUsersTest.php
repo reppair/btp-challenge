@@ -43,6 +43,7 @@ test('the user weather can be loaded via query parameter', function () {
             $json->has('data.0.weather', null) // user#1 has no weather
                 ->has('data.1.weather', fn (AssertableJson $json) =>
                     $json->where('id', $weather->id)
+                        ->where('user_id', $weather->user_id)
                         ->where('timezone', $data->timezone)
                         ->where('current_temp', json_decode($data->currentTemp))
                         ->where('current_uvi', json_decode($data->currentUvi))
